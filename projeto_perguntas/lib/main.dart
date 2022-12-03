@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print, library_private_types_in_public_api
 import 'package:flutter/material.dart';
+import 'package:projeto_perguntas/answer.dart';
+import 'package:projeto_perguntas/question.dart';
 
 void main() {
   runApp(const QuestionApp());
@@ -17,10 +19,19 @@ class _QuestionAppState extends State<QuestionApp> {
 
   @override
   Widget build(BuildContext context) {
-    final questions = [
-      'what is your favorite color?',
-      'what\'s your favorite animal?',
-      'what is your favorite video-game?',
+    final List<Map<String, Object>> questions = [
+      {
+        'text': 'what is your favorite color?',
+        'answer': ['Black', 'Red', 'Green', 'White']
+      },
+      {
+        'text': 'what\'s your favorite animal?',
+        'answer': ['Habbit', 'Snake', 'Tiger', 'Lion']
+      },
+      {
+        'text': 'what is your favorite Console?',
+        'answer': ['PC', 'Playstation 4', 'Xbox One', 'Nitendo Switch']
+      },
     ];
 
     return MaterialApp(
@@ -30,21 +41,10 @@ class _QuestionAppState extends State<QuestionApp> {
         ),
         body: Column(
           children: <Widget>[
-            Text(questions.elementAt(_selectionQuestion)),
-            ElevatedButton(
-              onPressed: _answer,
-              child: const Text('Answer 1'),
-            ),
-            Text(questions.elementAt(1)),
-            ElevatedButton(
-              onPressed: _answer,
-              child: const Text('Answer 2'),
-            ),
-            Text(questions.elementAt(2)),
-            ElevatedButton(
-              onPressed: _answer,
-              child: const Text('Answer 3'),
-            ),
+            Question(questions[_selectionQuestion]['text'].toString()),
+            Answer('Answer 1', _answer),
+            Answer('Answer 2', _answer),
+            Answer('Answer 3', _answer),
           ],
         ),
       ),
