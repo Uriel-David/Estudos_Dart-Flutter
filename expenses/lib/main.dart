@@ -1,58 +1,85 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, library_private_types_in_public_api
+import 'package:expenses/components/chart.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import './components/transaction_form.dart';
 import './components/transaction_list.dart';
 import './models/trasaction.dart';
 
-void main() {
-  runApp(const ExpensesApp());
-}
+main() => runApp(const ExpensesApp());
 
 class ExpensesApp extends StatelessWidget {
   const ExpensesApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: MyHomePage(),
+    final ThemeData theme = ThemeData();
+
+    return MaterialApp(
+      home: const MyHomePage(),
+      theme: theme.copyWith(
+        colorScheme: theme.colorScheme.copyWith(
+          primary: Colors.purple,
+          secondary: Colors.amber,
+        ),
+        textTheme: theme.textTheme.copyWith(
+          headline6: const TextStyle(
+            fontFamily: 'OpenSans',
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+          button: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        appBarTheme: const AppBarTheme(
+          titleTextStyle: TextStyle(
+            fontFamily: 'OpenSans',
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final _trasactions = [
-    Transaction(
-      id: 't1',
-      title: 'New Tennis',
-      value: 310.76,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't2',
-      title: 'Electricity Bill',
-      value: 110.39,
-      date: DateTime.now(),
-    ),
-  ];
+  final List<Transaction> _transactions = [];
 
-  _addTransaction(String title, double value) {
+  List<Transaction> get _recentTransactions {
+    return _transactions.where((tr) {
+      return tr.date.isAfter(DateTime.now().subtract(const Duration(days: 7)));
+    }).toList();
+  }
+
+  _addTransaction(String title, double value, DateTime date) {
     final newTransaction = Transaction(
       id: Random().nextDouble().toString(),
       title: title,
       value: value,
-      date: DateTime.now(),
+      date: date,
     );
 
     setState(() {
-      _trasactions.add(newTransaction);
+      _transactions.add(newTransaction);
+    });
+
+    Navigator.of(context).pop();
+  }
+
+  _removeTransaction(String id) {
+    setState(() {
+      _transactions.removeWhere((transaction) => transaction.id == id);
     });
   }
 
@@ -72,30 +99,23 @@ class _MyHomePageState extends State<MyHomePage> {
         title: const Text('Personal Expenses'),
         actions: <Widget>[
           IconButton(
-            onPressed: () => _openTransactionFormModal(context),
             icon: const Icon(Icons.add),
-          )
+            onPressed: () => _openTransactionFormModal(context),
+          ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            const SizedBox(
-              width: double.infinity,
-              child: Card(
-                color: Colors.blue,
-                elevation: 5,
-                child: Text('Graphic'),
-              ),
-            ),
-            TransactionList(_trasactions),
+            Chart(_recentTransactions),
+            TransactionList(_transactions, _removeTransaction),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _openTransactionFormModal(context),
         child: const Icon(Icons.add),
+        onPressed: () => _openTransactionFormModal(context),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
