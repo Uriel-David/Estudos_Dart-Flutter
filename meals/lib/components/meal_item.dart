@@ -12,10 +12,18 @@ class MealItem extends StatelessWidget {
   final Meal meal;
 
   void _selectMeal(BuildContext context) {
-    Navigator.of(context).pushNamed(
+    Navigator.of(context)
+        .pushNamed(
       AppRoutes.mealDetail,
       arguments: meal,
-    );
+    )
+        .then((result) {
+      if (result == null) {
+        print('No results');
+      } else {
+        print('Name meal: $result');
+      }
+    });
   }
 
   @override
