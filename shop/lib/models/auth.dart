@@ -1,6 +1,6 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shop/exceptions/auth_exception.dart';
 
@@ -11,7 +11,7 @@ class Auth with ChangeNotifier {
     String urlFragment,
   ) async {
     final url =
-        'https://identitytoolkit.googleapis.com/v1/accounts:$urlFragment?key=AIzaSyCgqWvTheXNJ2oPMf-Kzwgxn00pTSAlMmg';
+        'https://identitytoolkit.googleapis.com/v1/accounts:$urlFragment?key=${dotenv.env['FIREBASE_API_TOKEN']}';
 
     final response = await http.post(
       Uri.parse(url),
