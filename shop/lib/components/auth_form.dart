@@ -147,7 +147,7 @@ class _AuthFormState extends State<AuthForm> {
                       : (passwordValue) {
                           final password = passwordValue ?? '';
 
-                          if (password != passwordController) {
+                          if (password != passwordController.text) {
                             return 'Password empty or not equals.';
                           }
 
