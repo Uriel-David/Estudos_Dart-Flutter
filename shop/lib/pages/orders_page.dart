@@ -14,6 +14,7 @@ class OrderPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // final OrderList orders = Provider.of(context);
+    OrderList order = Provider.of<OrderList>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -21,7 +22,7 @@ class OrderPage extends StatelessWidget {
       ),
       drawer: const AppDrawer(),
       body: FutureBuilder(
-        future: Provider.of<OrderList>(context, listen: false).loadOrders(),
+        future: order.loadOrders(),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -32,17 +33,21 @@ class OrderPage extends StatelessWidget {
               child: Text('Something went wrong!'),
             );
           } else {
-            return RefreshIndicator(
-              onRefresh: () => _refreshOrders(context),
-              child: Consumer<OrderList>(
-                builder: (ctx, orders, child) => ListView.builder(
-                  itemCount: orders.itemsCount,
-                  itemBuilder: (ctx, index) => OrderWidget(
-                    order: orders.items[index],
-                  ),
-                ),
-              ),
-            );
+            return order.itemsCount == 0
+                ? const Center(
+                    child: Text('No Orders'),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () => _refreshOrders(context),
+                    child: Consumer<OrderList>(
+                      builder: (ctx, orders, child) => ListView.builder(
+                        itemCount: orders.itemsCount,
+                        itemBuilder: (ctx, index) => OrderWidget(
+                          order: orders.items![index],
+                        ),
+                      ),
+                    ),
+                  );
           }
         },
       ),

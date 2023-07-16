@@ -39,7 +39,7 @@ class ProductsPage extends StatelessWidget {
             itemCount: products.itemsCount,
             itemBuilder: (ctx, index) => Column(
               children: <Widget>[
-                ProductItem(products.items[index]),
+                ProductItem(products.items![index]),
                 const Divider(),
               ],
             ),
