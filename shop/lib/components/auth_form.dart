@@ -13,7 +13,8 @@ class AuthForm extends StatefulWidget {
   State<AuthForm> createState() => _AuthFormState();
 }
 
-class _AuthFormState extends State<AuthForm> {
+class _AuthFormState extends State<AuthForm>
+    with SingleTickerProviderStateMixin {
   final passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   bool isLoading = false;
@@ -23,15 +24,56 @@ class _AuthFormState extends State<AuthForm> {
     'password': '',
   };
 
+  AnimationController? controller;
+  Animation<double>? opacityAnimation;
+  Animation<Offset>? slideAnimation;
+
   bool _isLogin() => authMode == AuthMode.login;
   bool _isSignUp() => authMode == AuthMode.singUp;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(
+        milliseconds: 300,
+      ),
+    );
+
+    opacityAnimation = Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: controller!,
+      curve: Curves.linear,
+    ));
+
+    slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -1.5),
+      end: const Offset(0, 0),
+    ).animate(CurvedAnimation(
+      parent: controller!,
+      curve: Curves.linear,
+    ));
+
+    // heightAnimation?.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller?.dispose();
+  }
 
   void _switchAuthMode() {
     setState(() {
       if (_isLogin()) {
         authMode = AuthMode.singUp;
+        controller?.forward();
       } else {
         authMode = AuthMode.login;
+        controller?.reverse();
       }
     });
   }
@@ -95,28 +137,26 @@ class _AuthFormState extends State<AuthForm> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Container(
-        margin: const EdgeInsets.only(
-          bottom: 20,
-        ),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn,
         padding: const EdgeInsets.all(16),
         height: _isLogin() ? 310 : 400,
+        // height: _heightAnimation?.value.height ?? (_isLogin() ? 310 : 400),
         width: deviceSize.width * 0.75,
         child: Form(
           key: formKey,
           child: Column(
-            children: <Widget>[
+            children: [
               TextFormField(
                 decoration: const InputDecoration(labelText: 'E-mail'),
                 keyboardType: TextInputType.emailAddress,
                 onSaved: (email) => authData['email'] = email ?? '',
                 validator: (emailValue) {
                   final email = emailValue ?? '';
-
                   if (email.trim().isEmpty || !email.contains('@')) {
-                    return 'Email invalid.';
+                    return 'Please provide a valid email.';
                   }
-
                   return null;
                 },
               ),
@@ -128,32 +168,41 @@ class _AuthFormState extends State<AuthForm> {
                 onSaved: (password) => authData['password'] = password ?? '',
                 validator: (passwordValue) {
                   final password = passwordValue ?? '';
-
                   if (password.isEmpty || password.length < 5) {
-                    return 'Password invalid: length less than 5 or empty.';
+                    return 'Please provide a valid password';
                   }
-
                   return null;
                 },
               ),
-              if (_isSignUp())
-                TextFormField(
-                  decoration:
-                      const InputDecoration(labelText: 'Password Confirm'),
-                  keyboardType: TextInputType.emailAddress,
-                  obscureText: true,
-                  validator: _isLogin()
-                      ? null
-                      : (passwordValue) {
-                          final password = passwordValue ?? '';
-
-                          if (password != passwordController.text) {
-                            return 'Password empty or not equals.';
-                          }
-
-                          return null;
-                        },
+              AnimatedContainer(
+                constraints: BoxConstraints(
+                  minHeight: _isLogin() ? 0 : 60,
+                  maxHeight: _isLogin() ? 0 : 120,
                 ),
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.linear,
+                child: FadeTransition(
+                  opacity: opacityAnimation!,
+                  child: SlideTransition(
+                    position: slideAnimation!,
+                    child: TextFormField(
+                      decoration:
+                          const InputDecoration(labelText: 'Confirm password'),
+                      keyboardType: TextInputType.emailAddress,
+                      obscureText: true,
+                      validator: _isLogin()
+                          ? null
+                          : (passwordValue) {
+                              final password = passwordValue ?? '';
+                              if (password != passwordController.text) {
+                                return 'Entered passwords do not match.';
+                              }
+                              return null;
+                            },
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 20),
               if (isLoading)
                 const CircularProgressIndicator()
@@ -161,23 +210,25 @@ class _AuthFormState extends State<AuthForm> {
                 ElevatedButton(
                   onPressed: _submit,
                   style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 8,
-                      )),
-                  child:
-                      Text(authMode == AuthMode.login ? 'Login' : 'Register'),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 8,
+                    ),
+                  ),
+                  child: Text(
+                    authMode == AuthMode.login ? 'Login' : 'Register',
+                  ),
                 ),
               const Spacer(),
               TextButton(
                 onPressed: _switchAuthMode,
-                child: Text(_isLogin()
-                    ? 'Do you want to register?'
-                    : 'Already have an account?'),
-              )
+                child: Text(
+                  _isLogin() ? 'Want to register?' : 'Already have an account?',
+                ),
+              ),
             ],
           ),
         ),
