@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/models/auth.dart';
-import 'package:shop/pages/orders_page.dart';
 import 'package:shop/utils/app_routes.dart';
-import 'package:shop/utils/custom_route.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
