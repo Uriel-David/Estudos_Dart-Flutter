@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:flutter/material.dart';
 import 'package:great_places/providers/great_places.dart';
 import 'package:great_places/utils/app_routes.dart';
@@ -21,23 +20,32 @@ class PlacesListScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Consumer<GreatPlaces>(
-        builder: (ctx, greatPlaces, child) => greatPlaces.itemsCounts == 0
-            ? child
-            : ListView.builder(
-                itemCount: greatPlaces.itemsCounts,
-                itemBuilder: (ctx, index) => ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage:
-                        FileImage(greatPlaces.getItemByIndex(index).image),
-                  ),
-                  title: Text(greatPlaces.getItemByIndex(index).title),
-                  onTap: () {},
+      body: FutureBuilder(
+        future: Provider.of<GreatPlaces>(context, listen: false).loadPlaces(),
+        builder: (ctx, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Consumer<GreatPlaces>(
+                builder: (ctx, greatPlaces, child) => greatPlaces.itemsCounts ==
+                        0
+                    ? child!
+                    : ListView.builder(
+                        itemCount: greatPlaces.itemsCounts,
+                        itemBuilder: (ctx, index) => ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: FileImage(
+                                greatPlaces.getItemByIndex(index).image),
+                          ),
+                          title: Text(greatPlaces.getItemByIndex(index).title),
+                          onTap: () {},
+                        ),
+                      ),
+                child: const Center(
+                  child: Text('Not found locations!'),
                 ),
               ),
-        child: const Center(
-          child: Text('Not found locations!'),
-        ),
       ),
     );
   }

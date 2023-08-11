@@ -47,5 +47,19 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<string>location</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This permission is required to be able to use the camera.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This permission is required to be able to use the camera.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This permission is required to be able to use the camera.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location access must be allowed for the feature to work.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Location access must be allowed for the feature to work.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Location access must be allowed for the feature to work.</string>
 </dict>
 </plist>
