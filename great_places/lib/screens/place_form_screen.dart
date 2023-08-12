@@ -1,6 +1,7 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:great_places/providers/great_places.dart';
 import 'package:great_places/widgets/image_input.dart';
 import 'package:great_places/widgets/location_input.dart';
@@ -16,17 +17,33 @@ class PlaceFormScreen extends StatefulWidget {
 class _PlaceFormScreenState extends State<PlaceFormScreen> {
   final _titleController = TextEditingController();
   File? pickedImage;
+  LatLng? pickedPosition;
 
   void _selectedImage(File pickedImageValue) {
-    pickedImage = pickedImageValue;
+    setState(() {
+      pickedImage = pickedImageValue;
+    });
+  }
+
+  void _selectedPosition(LatLng pickedPositionValue) {
+    setState(() {
+      pickedPosition = pickedPositionValue;
+    });
+  }
+
+  bool _isValidForm() {
+    return _titleController.text.isNotEmpty &&
+        pickedImage != null &&
+        pickedPosition != null;
   }
 
   void _submitForm() {
-    if (_titleController.text.isEmpty || pickedImage == null) return;
+    if (!_isValidForm()) return;
 
     Provider.of<GreatPlaces>(context, listen: false).addPlace(
       _titleController.text,
       pickedImage!,
+      pickedPosition!,
     );
 
     Navigator.of(context).pop();
@@ -52,11 +69,14 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                       decoration: const InputDecoration(
                         labelText: 'Title',
                       ),
+                      onChanged: (text) {
+                        setState(() {});
+                      },
                     ),
                     const SizedBox(height: 10),
                     ImageInput(_selectedImage),
                     const SizedBox(height: 10),
-                    const LocationInput(),
+                    LocationInput(_selectedPosition),
                   ],
                 ),
               ),
@@ -71,7 +91,7 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
               elevation: 0,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            onPressed: _submitForm,
+            onPressed: _isValidForm() ? _submitForm : null,
           ),
         ],
       ),
