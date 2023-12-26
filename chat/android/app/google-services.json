@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "446803520144",
+    "project_id": "curso-flutter-chat-3119f",
+    "storage_bucket": "curso-flutter-chat-3119f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446803520144:android:7f166705268538bb694615",
+        "android_client_info": {
+          "package_name": "com.uriel.chat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiD5L04gf6QYXvre-MIF2yxr6X-fi2hak"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
